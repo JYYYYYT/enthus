@@ -26,7 +26,10 @@ contradicts them, change the documents first (see "Architecture changes").
 ## Milestone discipline
 
 - Work on one milestone at a time, in order. Do not build abstractions a
-  later milestone owns — e.g. no generic plugin interfaces during M2.
+  later milestone owns — e.g. no generic plugin system during M2 or M3.
+- The first product proof is proactive conversation without an assigned
+  work task. M2 builds that experience, M3 evaluates it, and M4 uses a work
+  scenario to test generality before extracting reusable interfaces.
 - A milestone is done only when every exit criterion in its file is checked
   off. Partial work is reported as partial.
 - When a milestone completes: update its `Status:` line, update the table in
@@ -46,12 +49,18 @@ possible contribution.
 - **Silence is first-class.** Waiting is an explicit decision with wake
   conditions, not the absence of output.
 - **Candidate actions, not abstract scores.** Policies compare concrete
-  options; there is no free-floating "proactiveness" number.
-- **Pluggable surfaces use `typing.Protocol`.** Never force users to inherit
-  from a base class to satisfy an interface.
+  options; there is no free-floating "proactiveness" number. Separate
+  policies, an Attention class, and an Arbiter class are not required.
+- **Established pluggable surfaces use `typing.Protocol`.** Never force
+  users to inherit from a base class. Do not invent plugin surfaces before
+  scenarios demonstrate the need for them.
 - **The framework never interprets event payload semantics.** Meaning-making
-  lives in Attention and policies.
+  lives in application context construction and decision logic; generic
+  routing, persistence, and scheduling use explicit IDs and metadata.
 - **Persona is data, not code.** The framework stays persona-neutral.
+- **Conversation quality is part of acceptance.** The reference application
+  owns the usefulness, grounding, continuity, and timing of its messages,
+  even when a host-supplied model generates them.
 - **The model never widens its own mandate.** Budgets and action scopes are
   granted by the host; model-drafted concerns cannot exceed them.
 
@@ -73,4 +82,7 @@ wrong — but the change must be explicit:
   dataclass, and interface is fully typed; the package ships `py.typed`.
   Untyped public code is treated as unfinished.
 - Scenario packs are the test suite: replayable event sequences with
-  asserted decisions, not mocks-only unit tests.
+  asserted state transitions and constraint behavior. Recorded model outputs
+  make regression replays reproducible; live model behavior and conversation
+  quality also require owner review. Passing a replay is not proof of a
+  desirable conversational experience.

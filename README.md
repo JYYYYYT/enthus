@@ -1,49 +1,40 @@
 # Enthus
 
-**A proactive decision layer for LLM applications** — an embeddable module
-that gives a language-model application continuous perception and autonomous
-judgment: *when* to act, *when* to keep investigating, *when* to wait, and
-*when* it is worth interrupting a human.
+**A proactive decision layer for LLM applications.**
 
-## Why
+Enthus explores how an AI can remember shared topics, investigate relevant
+questions, and start a worthwhile conversation without a new instruction.
+Choosing silence and responding to feedback are part of that behavior.
 
-Today's LLM applications are either reactive (a human asks, the model
-answers) or mechanical (cron fires fixed logic on a schedule). Neither can
-do what a good assistant — human or fictional — actually does: keep
-perceiving the world without being prompted, keep caring about something
-while no new input arrives, gather information on its own initiative, stay
-silent when there is nothing worth saying, and speak up at the right moment.
+## First proof
 
-Enthus is the missing piece between "the model can reason" and "the
-application acts on its own judgment".
+The first prototype will be a conversational companion: one user, one chat
+surface, a small memory store, and one queryable information source. It will
+continue shared topics, share grounded discoveries, and reconnect when the
+timing and content justify it. It must also respect muting, avoid repeated
+messages, and recover after a restart.
 
-## What it is
+## Long-term deliverable
 
-- A **decision core**: one call in (`evaluate(context)`), one decision out
-  (`Execute` / `Wait` / `Complete`), organized around *concerns* — things
-  the application keeps caring about even when no new event arrives.
-- **Continuous perception**: event streams and scheduled wake-ups keep the
-  system aware; attention decides what deserves a deeper look, and the
-  system can actively acquire information it was never given.
-- A **replaceable run shell** for standalone use: persistence, scheduling,
-  idempotent execution.
-- Persona-neutral by design; personality is configuration, not code.
+After validating the experience, a work scenario will test which mechanisms
+generalize. Those shared mechanisms will become an embeddable decision core
+with a replaceable standalone runtime. Memory, tools, and persona can be
+supplied by the host; the reference chat application demonstrates the complete
+experience. The prototype is not a commitment to a general chatbot platform
+or a full memory framework.
 
-## What it is not
-
-- Not an agent framework. It does not compete with LangGraph, AutoGen, or
-  CrewAI — it is built to be called *from* them, or from any LLM-powered
-  application.
-- Not a memory system, not a persona engine, not a chatbot.
+Python and SQLite are the starting point. API names remain provisional until
+the scenarios justify stable contracts.
 
 ## Status
 
-Early, pre-code. The project is currently at **M1: behavior specification** —
-15 concrete scenarios that define what the system must do before any
-interface is designed. See the roadmap:
+Early, pre-code. **M1: behavior specification** is in progress. The roadmap
+has been revised to validate proactive conversation in M2, refine the
+experience in M3, and extract reusable interfaces with a work scenario in M4.
+The revised specification still requires owner review.
 
-- [Roadmap.md](Roadmap.md) — vision, architecture, working agreements
-- [docs/roadmap/M1.md](docs/roadmap/M1.md) — behavior specification (current)
+- [Roadmap.md](Roadmap.md) — vision, architecture, and milestone order
+- [docs/roadmap/M1.md](docs/roadmap/M1.md) — scenarios and design strain log
 - [docs/roadmap/](docs/roadmap/) — all milestones, M1 through M5
 
 ## License

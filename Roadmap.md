@@ -1,146 +1,179 @@
 # Enthus — Roadmap
 
 > A proactive decision layer for LLM applications.
-> This file is the master reference. Read it first in any fresh session,
-> then read the milestone file for the current phase.
+> Read this file first, then the milestone whose status is `in progress`.
 
 ## Vision
 
-Today's AI systems fall into two categories:
+Build an AI experience that remembers shared topics, explores relevant
+questions, and initiates worthwhile conversation without a fresh instruction
+or an assigned work task. It should also choose silence, respect boundaries,
+and change its behavior when the user gives feedback.
 
-- **Reactive**: a human asks, the model answers. The loop is driven by the human.
-- **Mechanical**: cron-style triggers fire fixed logic on a schedule. No judgment.
+The first proof is a conversational companion with continuity and initiative.
+Whether that experience is welcome must be tested with the project owner.
+A functioning event loop alone does not establish product value.
 
-What science-fiction assistants have — and what is missing — is an **autonomous
-loop**: continuously perceive, decide *whether* to act or stay silent, act, and
-feed the outcome back into memory. This project builds that missing piece.
+Timers and external events are both valid wake-up mechanisms. Initiative
+comes from choosing what to investigate or say in context, not from avoiding
+scheduled execution.
 
-## Positioning
+## Positioning and delivery order
 
-Enthus serves **LLM-powered applications** — chatbots, companions,
-assistants, and agent workflows alike: anything built around a language
-model that must keep perceiving and judging while nobody is prompting it.
+The long-term deliverable remains a narrow, open-source decision module for
+chatbots, companions, assistants, and agent workflows. Its working question:
 
-Enthus is **not** an agent framework. It does not compete with LangGraph,
-AutoGen, or CrewAI. It is a narrow, embeddable, low-level module that
-answers one question those frameworks leave unanswered:
+> Given our shared context, what has changed, and the resources available,
+> should I investigate, speak, wait, or end this follow-up?
 
-> Given what I currently care about, what has changed, and what resources I
-> have left — should I act now, wait, or stop?
+First build a reference chat application that makes the behavior observable.
+Then validate it in sustained use. Only after a second, work-oriented scenario
+should shared behavior become reusable public interfaces.
 
-Two usage modes must both be supported:
+The release must support:
 
-1. **Embedded**: a host application (e.g. a LangGraph workflow) calls the
-   decision core directly — one call in, one decision out — and keeps its own
-   scheduling, persistence, and lifecycle.
-2. **Standalone**: an application uses the full runtime (decision core plus
-   the default run shell) out of the box.
+1. **Embedded use:** a host calls the decision core and owns scheduling,
+   persistence, tools, and lifecycle.
+2. **Standalone use:** a reference run shell provides those services.
 
-The decision core is the product. The run shell is a replaceable reference
-implementation.
+These are release goals, not two runtimes to build during M2. The project
+must demonstrate its differentiation through behavior and integration value,
+without assuming existing frameworks lack every supporting capability.
 
-## Core Architecture
+## MVP scope
 
-The system is organized around **Concerns** — things the system continues to
-care about even when no new event arrives. Events are stimuli; Concerns are
-state. A concern may be a goal, a commitment, an open question, or an interest.
+One user, one bidirectional chat surface, one queryable information source,
+one decision model, a small memory store, and a single-process runtime.
+The three initiative behaviors are:
+
+- Continue a meaningful shared topic with something concrete to add.
+- Investigate and share a relevant new finding.
+- Reconnect at an appropriate opportunity, when there is a worthwhile opening.
+
+The user can reply naturally, correct remembered information, mute unsolicited
+conversation, or stop exploration. A presence event or elapsed interval never
+requires a greeting. Research that finds nothing useful may end silently.
+
+## Working architecture
 
 ```text
-Event streams --> Attention (dedupe, weak-signal accumulation, coarse filter)
-                     | updates state
-                     v
-              Concern set  <-- scheduled wake-ups (next_check_at)
-                     |
-                     v
-              Decision core: evaluate(snapshot)
-                1. Propose candidate actions (policies propose here)
-                2. Hard-constraint filter (budget / permission / idempotency)
-                3. Compare and select ONE next step
-                     |
-                     v
-              Decision: Execute(action) | Wait(until, wake_on) | Complete(reason)
-                     |
-                     v
-              Run shell (persistence, scheduling, idempotent execution)
-                     |
-                     v
-              Host agent / tools (do the actual work)
+User messages / source events / due wake-ups / action outcomes
+                         |
+                         v
+              Run shell: ingest, dedupe, route by ID
+                         |
+                         v
+              Context: background + recent records
+                       + relevant topics + current state
+                         |
+                         v
+              Decision: investigate / speak / wait / end
+                         |
+                         v
+              Run shell: validate limits, persist, execute
+                         |
+                         v
+              Chat output / information-source tool
+                         |
+                         +-- linked outcome --> ingestion
+
+SQLite stores state, events, decisions, actions, and memory.
+Feedback updates stored preferences and the shell's future wake-up choices.
 ```
 
-Key structural rules:
+`Execute(action)`, `Wait(until, wake_on)`, and `Complete(reason)` remain
+working decision forms. Investigating and speaking are different actions.
+Ending an exploration does not delete its topic or end the conversation.
+Names and type boundaries are provisional until M4/M5.
 
-- **The decision core never touches the world.** `evaluate()` returns a
-  decision; the shell persists and executes it. This keeps the core testable
-  and embeddable.
-- **Constraints are hard gates.** Budget exhaustion or missing permission can
-  never be overridden by a high score from any policy.
-- **Silence is first-class.** `Wait` is an explicit, inspectable decision with
-  wake conditions — not the absence of a decision.
-- **Policies propose, the arbiter disposes.** Policies do not see each other.
-  Semantics live in policies; arithmetic lives in the arbiter.
-- **Candidate actions, not abstract scores.** Policies evaluate concrete
-  options ("check recent changes" vs "notify now" vs "wait two minutes"),
-  never a free-floating "proactiveness score".
+### Boundaries that matter now
 
-### Concern taxonomy
+- **Decision and execution are separate.** Evaluation may call a model but
+  does not send messages, invoke world-facing tools, or schedule real timers.
+- **Constraints are hard gates.** The host grants tool scope, model/exploration
+  budgets, and notification limits. Decisions cannot enlarge those grants.
+  The shell rechecks cancellation and applicable limits before execution.
+- **Silence is explicit.** Waiting includes a time or event condition; an
+  unproductive exploration may close with no user-facing message.
+- **Evaluate concrete next steps.** One decider can compare investigation,
+  speaking, waiting, and ending. Separate Attention, Policy, and Arbiter
+  plugins are not MVP requirements.
+- **Results return by identity.** Action outcomes carry stable action and
+  follow-up IDs. Semantic memory retrieval does not route execution results.
+- **Investigation value and speaking value differ.** A useful discovery may
+  be held or discarded as a conversational candidate. Before delayed delivery,
+  recheck freshness, relevance, mute state, and duplication.
+- **Personality is configuration.** Tone and initiative preferences can vary;
+  the reference application's generated content remains part of acceptance.
 
-| | Task concern | Interest concern |
-|---|---|---|
-| Example | Watch a deployment until stable | User is lately into sci-fi worldbuilding |
-| Success condition | Yes — closes when met | None — never "completes" |
-| Lifecycle | complete / cancel / expire | decay / refresh only |
-| Budget | task budget | separate "wandering" budget |
-| Purpose | Get the job done | Stay present ("aliveness") |
+### Topics, memory, and ongoing attention
 
-### Persona
+A topic groups related conversation or knowledge. A concern describes an
+ongoing reason to pay attention. They may be linked, but are not identical:
+mentioning a topic does not create a work assignment or authorize new access.
 
-Personality is **data, not code**: a config object holding tone, per-policy
-weights and thresholds, and interest lists. The framework stays
-persona-neutral; swapping configs swaps the "person". Persona affects both
-*what is said* (draft generation) and *when to speak* (thresholds).
+M2 may use small topic records and bounded exploration records instead of a
+general Task/Interest class hierarchy. Interests may become inactive, be
+corrected, or be removed; they are not required to live forever.
 
-## Validation Strategy
+Minimal memory consists of bounded core background, recent original records,
+and selected topic notes with provenance. Exact delivery, budget, and action
+state remain structured records. A vector service and recursive lifetime
+summarization are not prerequisites. A host may later supply memory retrieval.
 
-Architecture decisions must be earned by scenarios, not by intuition.
+### Run-shell reliability
 
-- **M2** validates *correctness* with a work scenario (deployment watch),
-  measured against a baseline of "fixed-interval check + simple rules".
-- **M4** validates *generality* with the aliveness family (interest concerns,
-  persona, social initiative) on the same architecture.
-- Only parts exercised by both scenario families may stabilize into the
-  public API (M5).
+- Persist pending actions, waits, budgets, and notification state in M2.
+- Process each follow-up sequentially; coalesce repeated incoming signals.
+- Commit an outcome and its pending follow-up event together, then consume
+  pending events recoverably. Reject stale or cancelled execution.
+- Cap steps, elapsed time, and spending, including model calls and exploration.
+- Use stable idempotency keys where supported. Unknown external outcomes
+  require verification or host intervention, not blind retry. Do not promise
+  universal exactly-once effects.
+- Resource exhaustion stops activity and becomes visible state. Status
+  delivery obeys notification settings; there is no blanket terminal-message
+  exception to mute or disturbance limits.
 
-## Project Constraints
+## Validation strategy
 
-- Language: **Python**, async-first, `typing.Protocol` for all pluggable
-  interfaces (no forced inheritance).
-- **Code carries type annotations throughout.** Every public function,
-  dataclass, and interface is fully typed; the package ships `py.typed` so
-  consumers get the same checking. Types are part of the interface contract.
-- **All natural language in the repo is English**: code comments, docstrings,
-  documents, commit messages.
-- Code must carry comments written for human readers — explain intent and
-  non-obvious decisions, not restate the code.
-- The framework never interprets event payload semantics; meaning-making
-  lives in Attention and policies.
-- The model may draft concerns, but budget and action scope are granted by
-  the host and can never be widened by the model itself.
+- **M2: behavioral feasibility.** Demonstrate the conversation loop on a live
+  chat surface and replay the conversation/reliability scenarios from M1.
+- **M3: experience value.** Review sustained use for substance, continuity,
+  timing, grounding, and burden. Compare against a simple scheduled check-in
+  baseline under comparable resource and notification limits.
+- **M4: generality.** Add deployment watch as a second scenario and extract
+  the shared decision core only after seeing what both families require.
+- **M5: adoption.** Stabilize supported contracts, package the library, and
+  demonstrate embedded and standalone use.
+
+Record actual interventions and sampled withheld opportunities. Reply rate
+and message volume are not standalone success metrics. Deterministic replay
+checks constraints and recovery; live evaluation checks model behavior and
+the experience. Neither substitutes for the other.
 
 ## Milestones
 
 | Milestone | File | Goal | Status |
 |---|---|---|---|
-| M1 | [M1.md](docs/roadmap/M1.md) | Behavior specification: 15 scenarios | in progress |
-| M2 | [M2.md](docs/roadmap/M2.md) | Prototype: deployment-watch scenario | pending |
-| M3 | [M3.md](docs/roadmap/M3.md) | Extract the decision core + persistence | pending |
-| M4 | [M4.md](docs/roadmap/M4.md) | Aliveness family: interest concerns + persona | pending |
+| M1 | [M1.md](docs/roadmap/M1.md) | Revised behavior specification: conversation first | in progress |
+| M2 | [M2.md](docs/roadmap/M2.md) | Proactive conversation MVP | pending |
+| M3 | [M3.md](docs/roadmap/M3.md) | Sustained experience validation and refinement | pending |
+| M4 | [M4.md](docs/roadmap/M4.md) | Work scenario, generality, and core extraction | pending |
 | M5 | [M5.md](docs/roadmap/M5.md) | Public API stabilization and open-source release | pending |
 
-## Working Agreements
+## Project constraints and working agreements
 
-- Implement milestone by milestone, in order. Do not build M3 abstractions
-  during M2.
-- After each milestone, revisit this roadmap and the architecture notes;
-  record every place reality strained the design.
-- A fresh session should read: `Roadmap.md` → current milestone file → any
-  `NOTES.md` left by the previous milestone.
+- Python, async-first, single process for the MVP. SQLite is the initial
+  persistence backend. Document a concrete reason for each dependency.
+- Keep implementation boundaries clear without a generic plugin system in
+  M2/M3. Established extension interfaces use `typing.Protocol`.
+- Code is typed throughout; public releases ship `py.typed`. Comments explain
+  intent and invariants. All repository prose, comments, and commits use English.
+- Work one milestone at a time. Architecture conflicts go in M1's strain log,
+  then into the affected design documents before implementation changes.
+- Preserve scenario IDs for traceability. Revised acceptance needs renewed
+  review; authorization to edit documents does not mark the owner's review done.
+- Completion requires every exit criterion, synchronized status lines, and
+  a short `NOTES.md` for the next milestone. Read Roadmap, the active milestone,
+  and any such handoff notes at the start of a new session.
