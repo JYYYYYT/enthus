@@ -86,6 +86,22 @@ working decision forms. Investigating and speaking are different actions.
 Ending an exploration does not delete its topic or end the conversation.
 Names and type boundaries are provisional until M4/M5.
 
+### Working glossary
+
+| Term | Meaning in this roadmap |
+|---|---|
+| **Topic** | A subject grouping related conversation and knowledge; it does not itself authorize activity. |
+| **Concern** | A continuing reason to pay attention, such as an interest, question, or commitment; a conceptual motivation. |
+| **Follow-up** | A tracked unit of ongoing activity, with an ID, state, limits, and wake conditions; the shell routes its action outcomes here. |
+| **Exploration** | A bounded follow-up that gathers information to resolve a question; it may end without a message. |
+| **Candidate** | A proposed next action, such as a query or message; it is not executed until selected and validated. Deferred candidates retain enough state for reconsideration. |
+| **Opening** | The conversational content of an unsolicited first turn; before delivery it is a message candidate, and after delivery it has an action/delivery record. |
+
+These distinctions do not require six classes or tables. M2 may represent a
+concern and its follow-up in one record. Topic links provide context; follow-up
+and action IDs provide execution identity. Closing an exploration or discarding
+a candidate does not delete the topic or end the user's conversation.
+
 ### Boundaries that matter now
 
 - **Decision and execution are separate.** Evaluation may call a model but
