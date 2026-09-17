@@ -37,6 +37,15 @@ The revised specification still requires owner review.
 - [docs/roadmap/M1.md](docs/roadmap/M1.md) — scenarios and design strain log
 - [docs/roadmap/](docs/roadmap/) — all milestones, M1 through M5
 
+## Contributor entry point
+
+Read [AGENTS.md](AGENTS.md) and its required documents before implementing.
+Other AI tools may need an explicit instruction to load that file. Follow the
+scope, evidence, and handoff rules in
+[EXECUTION.md](docs/roadmap/EXECUTION.md), and run
+`python3 scripts/check_roadmap.py` before reporting completion. A passing static
+check does not replace scenario tests or owner evaluation.
+
 ## License
 
 [Apache-2.0](LICENSE)

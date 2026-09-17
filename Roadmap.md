@@ -191,5 +191,18 @@ the experience. Neither substitutes for the other.
 - Preserve scenario IDs for traceability. Revised acceptance needs renewed
   review; authorization to edit documents does not mark the owner's review done.
 - Completion requires every exit criterion, synchronized status lines, and
-  a short `NOTES.md` for the next milestone. Read Roadmap, the active milestone,
+  a short `M<n>-NOTES.md` for the next milestone. Read Roadmap, the active milestone,
   and any such handoff notes at the start of a new session.
+
+## Execution and acceptance contract
+
+[EXECUTION.md](docs/roadmap/EXECUTION.md) defines scope handling, evidence kinds,
+and handoff requirements for every contributor. Acceptance checkboxes have
+stable IDs; checked criteria require corresponding artifacts in
+[EVIDENCE.md](docs/roadmap/EVIDENCE.md). Owner judgement cannot be replaced by
+another assistant's favorable review. A plan revision and milestone completion
+are separate events.
+
+Run `python3 scripts/check_roadmap.py` after changing these documents or phase
+status. It checks structural consistency and evidence references, not whether
+the implementation behaves correctly or the conversation is welcome.
