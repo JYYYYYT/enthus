@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "enthus"
+version = "0.0.1"
+description = "An experimental proactive conversation runtime"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+enthus = "enthus.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+enthus = ["py.typed"]

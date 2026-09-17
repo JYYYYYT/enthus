@@ -172,8 +172,8 @@ the experience. Neither substitutes for the other.
 
 | Milestone | File | Goal | Status |
 |---|---|---|---|
-| M1 | [M1.md](docs/roadmap/M1.md) | Revised behavior specification: conversation first | in progress |
-| M2 | [M2.md](docs/roadmap/M2.md) | Proactive conversation MVP | pending |
+| M1 | [M1.md](docs/roadmap/M1.md) | Revised behavior specification: conversation first | complete |
+| M2 | [M2.md](docs/roadmap/M2.md) | Proactive conversation MVP | in progress |
 | M3 | [M3.md](docs/roadmap/M3.md) | Sustained experience validation and refinement | pending |
 | M4 | [M4.md](docs/roadmap/M4.md) | Work scenario, generality, and core extraction | pending |
 | M5 | [M5.md](docs/roadmap/M5.md) | Public API stabilization and open-source release | pending |

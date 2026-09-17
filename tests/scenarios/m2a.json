@@ -1,0 +1,60 @@
+{
+  "version": "m2a-v1",
+  "cases": [
+    {
+      "name": "S19 persisted bidirectional context",
+      "steps": [
+        {"user": "I am making a tiny game."},
+        {"decision": {"kind": "speak", "text": "What kind of game?", "seconds": null, "reason": "Continue the user's topic"}},
+        {"drain": true},
+        {"restart": true},
+        {"user": "A puzzle game."},
+        {"decision": {"kind": "speak", "text": "We can keep the puzzle scope small.", "seconds": null, "reason": "Continue shared context"}},
+        {"drain": true},
+        {"expect": {"remaining_calls": 6, "sent": 2, "history": 4, "last_context_messages": 3}}
+      ]
+    },
+    {
+      "name": "S15 mute survives a reply and restart",
+      "steps": [
+        {"control": "start"}, {"control": "mute"}, {"advance": 60}, {"drain": true},
+        {"expect": {"remaining_calls": 8, "sent": 0, "mute_until": -1, "wake_at": null}},
+        {"user": "I can still ask you something."},
+        {"decision": {"kind": "speak", "text": "Yes, direct replies still work.", "seconds": null, "reason": "User initiated"}},
+        {"drain": true}, {"restart": true}, {"advance": 60}, {"drain": true},
+        {"expect": {"remaining_calls": 7, "sent": 1, "mute_until": -1}}
+      ]
+    },
+    {
+      "name": "S18 S23 waiting persists and a wake can be silent",
+      "steps": [
+        {"control": "start"}, {"advance": 60},
+        {"decision": {"kind": "wait", "text": null, "seconds": 120, "reason": "Nothing worth sharing yet"}},
+        {"drain": true}, {"expect": {"remaining_calls": 7, "sent": 0, "wake_in": 120}},
+        {"restart": true}, {"advance": 119}, {"drain": true},
+        {"expect": {"remaining_calls": 7, "sent": 0, "wake_in": 1}},
+        {"advance": 1},
+        {"decision": {"kind": "wait", "text": null, "seconds": null, "reason": "Wait for a user or new evidence"}},
+        {"drain": true}, {"expect": {"remaining_calls": 6, "sent": 0, "wake_at": null}}
+      ]
+    },
+    {
+      "name": "S24 exhausted budget emits no farewell",
+      "steps": [
+        {"control": "budget", "value": 0}, {"control": "start"}, {"advance": 60}, {"drain": true},
+        {"restart": true}, {"advance": 60}, {"drain": true},
+        {"expect": {"remaining_calls": 0, "sent": 0, "initiative_enabled": false, "wake_at": null}}
+      ]
+    },
+    {
+      "name": "S25 stop cancels a queued unsolicited message",
+      "steps": [
+        {"control": "start"}, {"advance": 60},
+        {"decision": {"kind": "speak", "text": "A queued opening.", "seconds": null, "reason": "Recorded candidate"}},
+        {"step": true}, {"control": "stop"}, {"drain": true}, {"restart": true},
+        {"advance": 60}, {"drain": true},
+        {"expect": {"remaining_calls": 7, "sent": 0, "initiative_enabled": false, "wake_at": null}}
+      ]
+    }
+  ]
+}

@@ -2,12 +2,23 @@
 
 This register supports the numbered criteria in M1–M5. Follow
 [EXECUTION.md](EXECUTION.md) for what each evidence kind must contain.
-No acceptance evidence has been recorded yet. Pending checkboxes remain pending.
+M1 acceptance is recorded below. M2 implementation evidence will be recorded
+separately; no M2 acceptance is implied by M1 approval.
 
 ## Register
 
 | Criterion | Kind | Artifact | Result |
 |---|---|---|---|
+| M1-E1 | owner | `docs/evidence/M1-acceptance.md` | pass |
+| M1-E2 | owner | `docs/evidence/M1-acceptance.md` | pass |
+| M1-E3 | owner | `docs/evidence/M1-acceptance.md` | pass |
+| M1-E4 | owner | `docs/evidence/M1-acceptance.md` | pass |
+| M1-E2 | document | `docs/roadmap/M1.md` | pass |
+| M1-E3 | document | `docs/roadmap/M1.md` | pass |
+| M1-E4 | document | `Roadmap.md` | pass |
+| M2-E1 | document | `docs/evidence/M2a-foundation.md` | pending |
+| M2-E2 | replay | `docs/evidence/M2a-foundation.md` | pending |
+| M2-E5 | document | `docs/evidence/M2a-foundation.md` | pending |
 
 ## Recording rules
 

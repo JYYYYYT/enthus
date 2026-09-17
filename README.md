@@ -28,14 +28,45 @@ the scenarios justify stable contracts.
 
 ## Status
 
-Early, pre-code. **M1: behavior specification** is in progress. The roadmap
-has been revised to validate proactive conversation in M2, refine the
-experience in M3, and extract reusable interfaces with a work scenario in M4.
-The revised specification still requires owner review.
+**M1 is approved. M2 is in progress.** The M2a foundation provides a duplex
+terminal, bounded recent context, SQLite persistence, explicit waits, and
+budget/mute/cancel/restart controls. It has recorded replays and a terminal
+process test; it does not yet prove worthwhile live initiative.
+
+Queryable information, topic notes, and grounded initiative are the next M2b
+checkpoint. M3 evaluates sustained experience; M4 tests a work scenario before
+extracting reusable interfaces.
 
 - [Roadmap.md](Roadmap.md) — vision, architecture, and milestone order
 - [docs/roadmap/M1.md](docs/roadmap/M1.md) — scenarios and design strain log
 - [docs/roadmap/](docs/roadmap/) — all milestones, M1 through M5
+
+## Try the foundation
+
+Use Python 3.11+ on macOS or Linux. There are no runtime dependencies to install.
+From the repository root:
+
+```sh
+PYTHONPATH=src python3.11 -m enthus --mode offline
+```
+
+Offline mode produces clearly labeled synthetic replies and chooses silence
+on wakes. It tests mechanics, not intelligence. State survives exit in the
+ignored `.enthus/state.sqlite3` file. Use `/help` and `/status` to inspect the
+controls, `/start` to grant initiative, and `/quit` to exit.
+
+An optional local Ollama adapter requires an explicitly chosen installed model.
+Read [the M2a guide](docs/M2a.md) for that invocation, recovery semantics, and
+current limitations. No real model/source trial has passed yet.
+
+```sh
+PYTHONPATH=src python3.11 -m unittest discover -s tests -v
+python3 -m unittest discover -s scripts -p 'test_*.py'
+python3 scripts/check_roadmap.py
+```
+
+[M2a evidence](docs/evidence/M2a-foundation.md) records the exact tested scope
+and the remaining S11–S25 gaps.
 
 ## Contributor entry point
 
