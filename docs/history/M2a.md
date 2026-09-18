@@ -1,5 +1,9 @@
 # M2a: Running the conversation foundation
 
+> Legacy terminal/source guide. This code does not implement continuous
+> co-presence. Use [the current M2 plan](../roadmap/M2.md) and
+> [handoff](../roadmap/M2-NOTES.md) for the next implementation step.
+
 Historical checkpoint guide. For the current source, topic, and experimental
 user-control behavior, see [M2b](M2b.md). M2a limitations below describe the
 foundation at its recorded snapshot, not every subsequent implementation.
@@ -87,7 +91,7 @@ This invalidation establishes freshness of the snapshot, not semantic quality.
 Before a model call, budget is durably reserved. Failure, timeout, interruption,
 and restart never refund that attempt. A model cannot increase the host's
 evaluation frequency, remaining budget, scope, or delivery quota. The exact
-defaults are in [M2](roadmap/M2.md).
+defaults are in [the historical implementation choices](M2-LEGACY.md).
 
 Before sending, the action becomes `sending`. A crash or unacknowledged send
 becomes `unknown`, not a retry. Processing pauses until the host inspects the
@@ -109,7 +113,7 @@ python3 scripts/check_roadmap.py
 
 Tests use real SQLite and recorded decisions with a controllable clock, plus
 a real CLI subprocess exercised through two-way pipes. They do not run a live
-model or external source. See [the evidence report](evidence/M2a-foundation.md)
+model or external source. See [the evidence report](../evidence/M2a-foundation.md)
 for the S11–S25 coverage map. The next checkpoint must add actual retrieval and
 pending result feedback, small source-backed topic notes, correction handling,
 and conversational initiative; shell correctness alone does not fulfill M2.

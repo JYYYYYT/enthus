@@ -1,86 +1,57 @@
 # Enthus
 
-**A proactive decision layer for LLM applications.**
+**An AI companion that shares the moment and remembers the experience.**
 
-Enthus explores how an AI can remember shared topics, investigate relevant
-questions, and start a worthwhile conversation without a new instruction.
-Choosing silence and responding to feedback are part of that behavior.
+Enthus explores **continuous co-presence**: while you share an activity, the
+companion keeps seeing and listening across conversational turns. It can notice
+something worth discussing, accept an interruption, or stay quietly available.
+Later conversations can build on what you experienced together.
 
-## First proof
+For example, while looking at a game or sketch together, it might connect a new
+detail to your earlier discussion without waiting for another question. It should
+also know when a comment would get in the way. This is the experience we are
+building toward, not a claim about the current implementation.
 
-The first prototype will be a conversational companion: one user, one chat
-surface, a small memory store, and one queryable information source. It will
-continue shared topics, share grounded discoveries, and reconnect when the
-timing and content justify it. It must also respect muting, avoid repeated
-messages, and recover after a restart.
+## Direction
 
-## Long-term deliverable
+One companion combines live participation with continuity across sessions.
+Background research or follow-up is added only when it improves that experience.
+Start with one user, one shared visual surface, and voice interaction; compare
+against a simple direct-model baseline before adding machinery.
 
-After validating the experience, a work scenario will test which mechanisms
-generalize. Those shared mechanisms will become an embeddable decision core
-with a replaceable standalone runtime. Memory, tools, and persona can be
-supplied by the host; the reference chat application demonstrates the complete
-experience. The prototype is not a commitment to a general chatbot platform
-or a full memory framework.
+Continuous presence means remaining receptive within the user's chosen scope.
+It does not require constant speech, endless generation, or all-day recording.
+The precise behavior is defined in [Roadmap](Roadmap.md#continuous-presence-contract).
 
-Python and SQLite are the starting point. API names remain provisional until
-the scenarios justify stable contracts.
+## Current state
 
-## Status
+**M2 is in progress; live audiovisual presence is not implemented yet.**
+The existing terminal prototype has topic memory, bounded Wikipedia queries,
+persistent state, and budget/mute/cancel controls. It has recorded tests and a
+source probe, but no successful live-model experience acceptance.
 
-**M1 is approved. M2 is in progress.** The M2a foundation provides a duplex
-terminal, bounded recent context, SQLite persistence, explicit waits, and
-budget/mute/cancel/restart controls. It has recorded replays and a terminal
-process test; it does not yet prove worthwhile live initiative.
+Next: choose one shared activity and model/media path, then demonstrate fresh
+input after a reply ends and a working stop. See [M2](docs/roadmap/M2.md) for the
+plan and [current handoff](docs/roadmap/M2-NOTES.md) for the working state.
 
-M2b now adds one bounded Wikipedia source, current topic notes and correction
-history, recoverable query results, and source-linked message candidates.
-Synthetic replays cover sharing and silence; a real source probe also passed.
-A live model conversation and owner quality review remain pending.
-M3 evaluates sustained experience; M4 tests a work scenario before extraction.
+## Try the existing terminal
 
-- [Roadmap.md](Roadmap.md) — vision, architecture, and milestone order
-- [docs/roadmap/M1.md](docs/roadmap/M1.md) — scenarios and design strain log
-- [docs/roadmap/](docs/roadmap/) — all milestones, M1 through M5
-
-## Try the foundation
-
-Use Python 3.11+ on macOS or Linux. There are no runtime dependencies to install.
-From the repository root:
+Python 3.11+ on macOS/Linux, no runtime dependencies. From the repository root:
 
 ```sh
 PYTHONPATH=src python3.11 -m enthus --mode offline
 ```
 
-Offline mode produces clearly labeled synthetic replies and chooses silence
-on wakes. It tests mechanics, not intelligence. State survives exit in the
-ignored `.enthus/state.sqlite3` file. Use `/help` and `/status` to inspect the
-controls, `/start` to grant initiative, and `/quit` to exit.
+This produces synthetic diagnostic replies; it is not the presence demo.
+Use `/help`, `/status`, and `/quit`. For the optional local-model/source setup,
+see the [terminal guide](docs/history/M2b.md).
 
-An optional local Ollama adapter requires an explicitly chosen installed model.
-Read [the M2b guide](docs/M2b.md) to enable source-backed initiative and inspect
-its limits. [The M2a guide](docs/M2a.md) describes the original foundation.
-The successful source probe is not a live model/conversation acceptance trial.
+## Read and contribute
 
-```sh
-PYTHONPATH=src python3.11 -m unittest discover -s tests -v
-python3 -m unittest discover -s scripts -p 'test_*.py'
-python3 scripts/check_roadmap.py
-```
+- [Roadmap](Roadmap.md): product meaning, architecture, and milestones.
+- [Behavior scenarios](docs/roadmap/M1.md): what must be observable.
+- [AGENTS.md](AGENTS.md): contributor workflow and coding rules.
+- [Evidence](docs/roadmap/EVIDENCE.md): what has actually been verified.
+- [History](docs/history/README.md): earlier plans and implementation guides.
 
-[M2b evidence](docs/evidence/M2b-initiative.md) records the current tested scope
-and remaining S11–S25 gaps. [M2a evidence](docs/evidence/M2a-foundation.md) is the
-historical foundation snapshot.
-
-## Contributor entry point
-
-Read [AGENTS.md](AGENTS.md) and its required documents before implementing.
-Other AI tools may need an explicit instruction to load that file. Follow the
-scope, evidence, and handoff rules in
-[EXECUTION.md](docs/roadmap/EXECUTION.md), and run
-`python3 scripts/check_roadmap.py` before reporting completion. A passing static
-check does not replace scenario tests or owner evaluation.
-
-## License
-
-[Apache-2.0](LICENSE)
+[Apache-2.0 license](LICENSE).

@@ -1,5 +1,9 @@
 # M2b: Bounded source-backed initiative
 
+> Legacy terminal/source guide. This code does not implement continuous
+> co-presence. Use [the current M2 plan](../roadmap/M2.md) and
+> [handoff](../roadmap/M2-NOTES.md) for the next implementation step.
+
 The application can now query one Wikipedia edition, retain source evidence,
 and evaluate whether it is worth sharing. Topics organize context; explicit
 exploration IDs route results and enforce lifecycle/budget rules. These are
@@ -111,7 +115,7 @@ An explicit public-source probe, independent of any conversation or model:
 PYTHONPATH=src python3.11 scripts/probe_source.py --language en --query 'puzzle game'
 ```
 
-The [evidence report](evidence/M2b-initiative.md) distinguishes synthetic
+The [evidence report](../evidence/M2b-initiative.md) distinguishes synthetic
 decision/source replays from the actual source probe. No successful live model
 session or owner experience acceptance is claimed. M2c must complete scenario
 and failure coverage before M2d's live conversation acceptance.

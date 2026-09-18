@@ -38,7 +38,7 @@ def validate(root: Path) -> list[str]:
     names = ["AGENTS.md", "README.md", "Roadmap.md"] + [
         f"docs/roadmap/{name}.md"
         for name in ["EXECUTION", "EVIDENCE", "M1", "M2", "M3", "M4", "M5"]
-    ]
+    ] + ["docs/history/REVISIONS.md", "docs/history/M1-2026-09-17.md"]
     for name in names:
         path = root / name
         if not path.is_file():
@@ -59,22 +59,38 @@ def validate(root: Path) -> list[str]:
             if not linked.exists():
                 errors.append(f"{name}: missing local link {target}")
 
-    # A removed or duplicated scenario must not silently disappear from coverage.
+    # Archiving an old contract must not erase it or mix it into the current proof.
     m1 = documents["docs/roadmap/M1.md"]
-    expected = Counter(range(1, 26))
-    # Common dash and spacing changes are editorial; IDs still match exactly.
-    headings = Counter(int(value) for value in re.findall(
-        r"^[ \t]{0,3}###[ \t]+S([1-9]\d*)[ \t]+[-–—][ \t]+\S[^\r\n]*$",
-        m1, re.M,
+    for label, name, first, last in (
+        ("Current M1", "docs/roadmap/M1.md", 26, 35),
+        ("Archived M1", "docs/history/M1-2026-09-17.md", 1, 25),
+    ):
+        content = documents[name]
+        expected = Counter(range(first, last + 1))
+        # Common dash and spacing changes are editorial; IDs still match exactly.
+        headings = Counter(int(value) for value in re.findall(
+            r"^[ \t]{0,3}###[ \t]+S([1-9]\d*)[ \t]+[-–—][ \t]+\S[^\r\n]*$",
+            content, re.M,
+        ))
+        walkthrough = Counter(
+            int(row[0][1:]) for row in table_rows(content)
+            if re.fullmatch(r"S[1-9]\d*", row[0])
+        )
+        if headings != expected:
+            errors.append(f"{label} scenario headings must contain S{first}–S{last} exactly once")
+        if walkthrough != expected:
+            errors.append(f"{label} walkthrough must contain S{first}–S{last} exactly once")
+
+    # Check traceability, not whether a paragraph or a runtime fulfills its meaning.
+    presence_ids = Counter(f"CP{number}" for number in range(1, 8))
+    definitions = Counter(re.findall(
+        r"\*\*(CP[1-9]\d*)[ \t]+[-–—][ \t]+", documents["Roadmap.md"],
     ))
-    walkthrough = Counter(
-        int(row[0][1:]) for row in table_rows(m1)
-        if re.fullmatch(r"S[1-9]\d*", row[0])
-    )
-    if headings != expected:
-        errors.append("M1 scenario headings must contain S1–S25 exactly once")
-    if walkthrough != expected:
-        errors.append("M1 walkthrough must contain S1–S25 exactly once")
+    if definitions != presence_ids:
+        errors.append("Roadmap must define CP1–CP7 exactly once")
+    presence_rows = [row for row in table_rows(m1) if re.fullmatch(r"CP[1-9]\d*", row[0])]
+    if Counter(row[0] for row in presence_rows) != presence_ids:
+        errors.append("M1 must map CP1–CP7 exactly once to scenarios and current criteria")
 
     statuses: list[str] = []
     criteria: dict[str, tuple[bool, set[str]]] = {}
@@ -109,8 +125,11 @@ def validate(root: Path) -> list[str]:
         if status == "complete":
             if any(match.group(1).lower() != "x" for match in matches):
                 errors.append(f"{name}: complete milestone still has unchecked criteria")
-            if not (root / f"docs/roadmap/{name}-NOTES.md").is_file():
-                errors.append(f"{name}: complete milestone needs {name}-NOTES.md")
+            if not any((root / f"docs/{folder}/{name}-NOTES.md").is_file()
+                       for folder in ("roadmap", "history")):
+                errors.append(f"{name}: complete milestone needs a current or archived {name}-NOTES.md")
+        if status == "in progress" and not (root / f"docs/roadmap/{name}-NOTES.md").is_file():
+            errors.append(f"{name}: active milestone needs docs/roadmap/{name}-NOTES.md")
         if status in {"in progress", "complete"} and any(
             previous != "complete" for previous in statuses[:-1]
         ):
@@ -118,6 +137,38 @@ def validate(root: Path) -> list[str]:
 
     if statuses.count("in progress") > 1:
         errors.append("At most one milestone may be in progress")
+
+    # Retired IDs remain valid historical references, never active exit criteria.
+    retired: dict[str, set[str]] = {}
+    revisions = documents["docs/history/REVISIONS.md"]
+    for row in table_rows(revisions):
+        if row[0] == "Retired ID" or all(re.fullmatch(r":?-+:?", cell) for cell in row):
+            continue
+        if len(row) != 4 or not re.fullmatch(r"M[1-5]-E[1-9]\d*", row[0]):
+            errors.append("REVISIONS: expected retired ID, evidence kinds, original requirement, replacements")
+            continue
+        key, kinds_text, original, replacements_text = row
+        kinds = {kind.strip() for kind in kinds_text.split(",")}
+        replacements = {value.strip() for value in replacements_text.split(",")}
+        if key in retired or key in criteria:
+            errors.append(f"REVISIONS {key}: retired ID is duplicated or reused as an active criterion")
+        if not original or not kinds or not kinds <= KINDS:
+            errors.append(f"REVISIONS {key}: missing original requirement or invalid evidence kinds")
+        if not replacements or not replacements <= criteria.keys():
+            errors.append(f"REVISIONS {key}: replacement IDs must name current criteria")
+        retired[key] = kinds
+
+    for row in presence_rows:
+        if len(row) != 3:
+            errors.append(f"M1 {row[0]}: expected contract, scenarios, and current criteria")
+            continue
+        key, scenarios_text, criteria_text = row
+        scenarios = {value.strip() for value in scenarios_text.split(",")}
+        mapped_criteria = {value.strip() for value in criteria_text.split(",")}
+        if not scenarios or not scenarios <= {f"S{number}" for number in range(26, 36)}:
+            errors.append(f"M1 {key}: unknown or missing scenario mapping")
+        if not mapped_criteria or not mapped_criteria <= criteria.keys():
+            errors.append(f"M1 {key}: mappings must reference current acceptance criteria")
 
     latest_result: dict[tuple[str, str], str] = {}
     register = documents["docs/roadmap/EVIDENCE.md"]
@@ -128,7 +179,7 @@ def validate(root: Path) -> list[str]:
             errors.append("EVIDENCE: each register row needs four columns")
             continue
         key, kind, artifact_text, result = cells
-        if key not in criteria:
+        if key not in criteria and key not in retired:
             errors.append(f"EVIDENCE: unknown criterion {key}")
         if kind not in KINDS or result not in {"pass", "fail", "pending"}:
             errors.append(f"EVIDENCE {key}: invalid kind or result")

@@ -9,7 +9,7 @@ Working tree based on `60cedbc` (the committed M2a foundation). Exact code,
 configuration and replay files are identified by `M2b-source-sha256.txt` in
 this directory. Fixture version: `m2b-v1-synthetic` in
 `tests/scenarios/m2b.json`. Runtime: Python 3.11, macOS, standard-library SQLite.
-Defaults are recorded in [M2](../roadmap/M2.md); replay tests override time,
+Defaults are recorded in [historical M2 choices](../history/M2-LEGACY.md); replay tests override time,
 grant and cadence explicitly. Source: one selected Wikipedia edition (`en`
 in the probe). Model decision fixtures are synthetic and labeled `recorded-v2`.
 

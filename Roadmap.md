@@ -1,208 +1,127 @@
 # Enthus — Roadmap
 
-> A proactive decision layer for LLM applications.
-> Read this file first, then the milestone whose status is `in progress`.
+> A companion for continuous co-presence and continuity across shared experiences.
 
-## Vision
+## Product direction
 
-Build an AI experience that remembers shared topics, explores relevant
-questions, and initiates worthwhile conversation without a fresh instruction
-or an assigned work task. It should also choose silence, respect boundaries,
-and change its behavior when the user gives feedback.
+The companion participates in an unfolding shared environment without requiring
+the user to turn every change into a prompt. It may notice, comment, ask,
+respond, or remain quietly available. Later sessions build on actual shared
+experiences. Whether this participation is welcome is part of acceptance.
 
-The first proof is a conversational companion with continuity and initiative.
-Whether that experience is welcome must be tested with the project owner.
-A functioning event loop alone does not establish product value.
+One product has two complementary modes:
 
-Timers and external events are both valid wake-up mechanisms. Initiative
-comes from choosing what to investigate or say in context, not from avoiding
-scheduled execution.
+- **B — Co-presence:** perceive and participate during an explicitly enabled session.
+- **A — Background follow-up:** investigate or reconnect under a separate bounded grant.
 
-## Positioning and delivery order
+Build B first, then cross-session continuity, then only the A behavior that use
+justifies. A session can include long quiet periods. Bounded sessions are the
+MVP's test boundary, not a requirement to reset after each reply or a ceiling
+on future duration. A generic framework or AGI claim is not a delivery goal.
 
-The long-term deliverable remains a narrow, open-source decision module for
-chatbots, companions, assistants, and agent workflows. Its working question:
+## Continuous presence contract
 
-> Given our shared context, what has changed, and the resources available,
-> should I investigate, speak, wait, or end this follow-up?
+These clauses define continuous presence. [M1](docs/roadmap/M1.md) translates
+them into observable scenarios; implementation shortcuts must preserve them.
 
-First build a reference chat application that makes the behavior observable.
-Then validate it in sustained use. Only after a second, work-oriented scenario
-should shared behavior become reusable public interfaces.
+- **CP1 — Shared environment.** Fresh visual/audio observations arrive without
+  a new user message, manual upload, or per-observation instruction. Sampling
+  and event-driven capture are allowed with measured freshness/missed-event limits.
+  Web queries or chat-history retrieval alone do not satisfy this requirement.
+- **CP2 — Presence survives a reply.** Output completion and silence leave the
+  granted session receptive to later changes. End, expiry, revoked permission,
+  or failure are explicit states. No endless generation or end-token removal
+  is required; keeping a process alive alone proves nothing.
+- **CP3 — Interaction is interruptible.** Input continues during generation and
+  playback. The host promptly stops playback and invalidates queued/stale output.
+  Slow research cannot block listening or stop controls. Queuing interruptions
+  until an old reply finishes is insufficient.
+- **CP4 — Participation is selective.** A relevant event can prompt a grounded
+  contribution without a question. Silence remains receptive. Constant scene
+  narration, compulsory greetings, and avoiding every opportunity all fail.
+  Observing a scene does not prove the user's intention or feelings.
+- **CP5 — Scope is explicit.** Show what is shared; distinguish stopping speech,
+  sensing, the session, and background work. Session access does not authorize
+  all-day recording. Memory restoration cannot reactivate sensors. Disconnection
+  or exhaustion must be visible, never presented as continued observation.
+- **CP6 — One companion spans time scales.** A and B share history, preferences,
+  grants, and activity identity, with separate execution needs. Session end
+  preserves history but grants no background work. Background results enter
+  current context and are reconsidered before they can interrupt.
+- **CP7 — Prove the experience.** Use live participation, sampled silence, and
+  owner review. Compare with a thin direct-model baseline and identify native
+  provider capabilities. Replay success, message volume, or human likeness
+  cannot establish experience value.
 
-The release must support:
+A **shared session** is a granted period with selected inputs, limits, and stop
+conditions. **Co-presence** is the experience of participating together;
+**continuous presence** is the capability to remain receptive across turns.
+Runtime continuity does not imply consciousness or a self-preservation goal.
 
-1. **Embedded use:** a host calls the decision core and owns scheduling,
-   persistence, tools, and lifecycle.
-2. **Standalone use:** a reference run shell provides those services.
+## First prototype
 
-These are release goals, not two runtimes to build during M2. The project
-must demonstrate its differentiation through behavior and integration value,
-without assuming existing frameworks lack every supporting capability.
+One user, one shared visual surface, bidirectional voice, one model/provider
+path, bounded context, and one local host. A game or sketch is an example;
+M2-P1 selects the activity. Use existing model capabilities, either native
+realtime or a measured composition. A media-capable UI is allowed. Desktop
+control, all-day sensing, durable raw-media recording, multi-provider support,
+and a generic plugin system are outside the first proof.
 
-## MVP scope
+## Architecture
 
-One user, one bidirectional chat surface, one queryable information source,
-one decision model, a small memory store, and a single-process runtime.
-The three initiative behaviors are:
+Live reception, interruption, and playback remain responsive while background
+work runs. Both use shared context and explicit activity identity. These are
+responsibilities, not required classes or separate products.
 
-- Continue a meaningful shared topic with something concrete to add.
-- Investigate and share a relevant new finding.
-- Reconnect at an appropriate opportunity, when there is a worthwhile opening.
+- **Host-owned effects:** inference proposes content/actions; the host controls
+  capture, playback, tools, persistence, and cancellation. `evaluate()` stays
+  effect-free without having to contain the whole live session. No extra model
+  decision or durable transaction is required for every media chunk.
+  Decisions select concrete next steps, not an abstract initiative score.
+- **Hard gates:** host-granted scope, budgets, and disturbance limits cannot be
+  overridden by model scores. Stops remain effective during late results and
+  reconnects. Speech, sensor, session, and follow-up controls follow M1 S31.
+- **Freshness and identity:** timestamp/version observations and outputs; route
+  outcomes by action/follow-up ID, not semantic similarity. Reject obsolete
+  output and keep media buffers bounded instead of replaying a growing queue.
+- **Truthful state:** distinguish generated, queued, played, cancelled, and
+  uncertain output. Playback does not prove the user heard it. Keep exact
+  execution state separate from evidence-backed memory; current corrections
+  override older claims. AI speech and nonresponse do not establish preferences.
+- **Bounded recovery:** reconcile unknown effects rather than blindly retrying.
+  Host restart leaves capture off; interrupted speech is not automatically
+  replayed. Enforce duration, media/context, and usage/spending limits; call
+  counts alone cannot bound a streaming session. Label estimates and expose
+  exhausted/degraded state without a compulsory model-generated farewell.
 
-The user can reply naturally, correct remembered information, mute unsolicited
-conversation, or stop exploration. A presence event or elapsed interval never
-requires a greeting. Research that finds nothing useful may end silently.
+Python, async-first host code, and SQLite are the starting point. Record reasons
+for dependencies before adding them. Style/persona is data and cannot override
+controls. Topics organize knowledge; concerns express reasons to pay attention;
+neither grants a mandate. Follow-ups identify bounded activity. Retrieval and
+memory frameworks are introduced only after demonstrated need.
 
-## Working architecture
+## Validation and milestones
 
-```text
-User messages / source events / due wake-ups / action outcomes
-                         |
-                         v
-              Run shell: ingest, dedupe, route by ID
-                         |
-                         v
-              Context: background + recent records
-                       + relevant topics + current state
-                         |
-                         v
-              Decision: investigate / speak / wait / end
-                         |
-                         v
-              Run shell: validate limits, persist, execute
-                         |
-                         v
-              Chat output / information-source tool
-                         |
-                         +-- linked outcome --> ingestion
-
-SQLite stores state, events, decisions, actions, and memory.
-Feedback updates stored preferences and the shell's future wake-up choices.
-```
-
-`Execute(action)`, `Wait(until, wake_on)`, and `Complete(reason)` remain
-working decision forms. Investigating and speaking are different actions.
-Ending an exploration does not delete its topic or end the conversation.
-Names and type boundaries are provisional until M4/M5.
-
-### Working glossary
-
-| Term | Meaning in this roadmap |
-|---|---|
-| **Topic** | A subject grouping related conversation and knowledge; it does not itself authorize activity. |
-| **Concern** | A continuing reason to pay attention, such as an interest, question, or commitment; a conceptual motivation. |
-| **Follow-up** | A tracked unit of ongoing activity, with an ID, state, limits, and wake conditions; the shell routes its action outcomes here. |
-| **Exploration** | A bounded follow-up that gathers information to resolve a question; it may end without a message. |
-| **Candidate** | A proposed next action, such as a query or message; it is not executed until selected and validated. Deferred candidates retain enough state for reconsideration. |
-| **Opening** | The conversational content of an unsolicited first turn; before delivery it is a message candidate, and after delivery it has an action/delivery record. |
-
-These distinctions do not require six classes or tables. M2 may represent a
-concern and its follow-up in one record. Topic links provide context; follow-up
-and action IDs provide execution identity. Closing an exploration or discarding
-a candidate does not delete the topic or end the user's conversation.
-
-### Boundaries that matter now
-
-- **Decision and execution are separate.** Evaluation may call a model but
-  does not send messages, invoke world-facing tools, or schedule real timers.
-- **Constraints are hard gates.** The host grants tool scope, model/exploration
-  budgets, and notification limits. Decisions cannot enlarge those grants.
-  The shell rechecks cancellation and applicable limits before execution.
-- **Silence is explicit.** Waiting includes a time or event condition; an
-  unproductive exploration may close with no user-facing message.
-- **Evaluate concrete next steps.** One decider can compare investigation,
-  speaking, waiting, and ending. Separate Attention, Policy, and Arbiter
-  plugins are not MVP requirements.
-- **Results return by identity.** Action outcomes carry stable action and
-  follow-up IDs. Semantic memory retrieval does not route execution results.
-- **Investigation value and speaking value differ.** A useful discovery may
-  be held or discarded as a conversational candidate. Before delayed delivery,
-  recheck freshness, relevance, mute state, and duplication.
-- **Personality is configuration.** Tone and initiative preferences can vary;
-  the reference application's generated content remains part of acceptance.
-
-### Topics, memory, and ongoing attention
-
-A topic groups related conversation or knowledge. A concern describes an
-ongoing reason to pay attention. They may be linked, but are not identical:
-mentioning a topic does not create a work assignment or authorize new access.
-
-M2 may use small topic records and bounded exploration records instead of a
-general Task/Interest class hierarchy. Interests may become inactive, be
-corrected, or be removed; they are not required to live forever.
-
-Minimal memory consists of bounded core background, recent original records,
-and selected topic notes with provenance. Exact delivery, budget, and action
-state remain structured records. A vector service and recursive lifetime
-summarization are not prerequisites. A host may later supply memory retrieval.
-
-### Run-shell reliability
-
-- Persist pending actions, waits, budgets, and notification state in M2.
-- Process each follow-up sequentially; coalesce repeated incoming signals.
-- Commit an outcome and its pending follow-up event together, then consume
-  pending events recoverably. Reject stale or cancelled execution.
-- Cap steps, elapsed time, and spending, including model calls and exploration.
-- Use stable idempotency keys where supported. Unknown external outcomes
-  require verification or host intervention, not blind retry. Do not promise
-  universal exactly-once effects.
-- Resource exhaustion stops activity and becomes visible state. Status
-  delivery obeys notification settings; there is no blanket terminal-message
-  exception to mute or disturbance limits.
-
-## Validation strategy
-
-- **M2: behavioral feasibility.** Demonstrate the conversation loop on a live
-  chat surface and replay the conversation/reliability scenarios from M1.
-- **M3: experience value.** Review sustained use for substance, continuity,
-  timing, grounding, and burden. Compare against a simple scheduled check-in
-  baseline under comparable resource and notification limits.
-- **M4: generality.** Add deployment watch as a second scenario and extract
-  the shared decision core only after seeing what both families require.
-- **M5: adoption.** Stabilize supported contracts, package the library, and
-  demonstrate embedded and standalone use.
-
-Record actual interventions and sampled withheld opportunities. Reply rate
-and message volume are not standalone success metrics. Deterministic replay
-checks constraints and recovery; live evaluation checks model behavior and
-the experience. Neither substitutes for the other.
-
-## Milestones
+Bring a bounded live check forward, with controls from the start. Compare using
+the same model, sensory access, activity, and basic context where possible;
+record differences. Review grounding, participation, missed opportunities,
+interruption/staleness latency, continuity, burden, and cost. Record numeric
+targets before trials. Replays check mechanics, live tests check interaction,
+and owner review checks value; a small trial does not establish market demand.
 
 | Milestone | File | Goal | Status |
 |---|---|---|---|
-| M1 | [M1.md](docs/roadmap/M1.md) | Revised behavior specification: conversation first | complete |
-| M2 | [M2.md](docs/roadmap/M2.md) | Proactive conversation MVP | in progress |
-| M3 | [M3.md](docs/roadmap/M3.md) | Sustained experience validation and refinement | pending |
-| M4 | [M4.md](docs/roadmap/M4.md) | Work scenario, generality, and core extraction | pending |
-| M5 | [M5.md](docs/roadmap/M5.md) | Public API stabilization and open-source release | pending |
+| M1 | [M1.md](docs/roadmap/M1.md) | Behavior specification; historical approval retained | complete |
+| M2 | [M2.md](docs/roadmap/M2.md) | Bounded continuous co-presence | in progress |
+| M3 | [M3.md](docs/roadmap/M3.md) | Cross-session continuity and sustained value | pending |
+| M4 | [M4.md](docs/roadmap/M4.md) | Second scenario and evidenced reuse | pending |
+| M5 | [M5.md](docs/roadmap/M5.md) | Reproducible companion and justified components | pending |
 
-## Project constraints and working agreements
+M1's completion covers its 2026-09-17 approval only; current S26-S35 behavior
+is accepted through M2/M3. M4 chooses its second scenario from actual needs;
+deployment watch is optional. M5 releases the companion; independent integration
+must justify any separately published library.
 
-- Python, async-first, single process for the MVP. SQLite is the initial
-  persistence backend. Document a concrete reason for each dependency.
-- Keep implementation boundaries clear without a generic plugin system in
-  M2/M3. Established extension interfaces use `typing.Protocol`.
-- Code is typed throughout; public releases ship `py.typed`. Comments explain
-  intent and invariants. All repository prose, comments, and commits use English.
-- Work one milestone at a time. Architecture conflicts go in M1's strain log,
-  then into the affected design documents before implementation changes.
-- Preserve scenario IDs for traceability. Revised acceptance needs renewed
-  review; authorization to edit documents does not mark the owner's review done.
-- Completion requires every exit criterion, synchronized status lines, and
-  a short `M<n>-NOTES.md` for the next milestone. Read Roadmap, the active milestone,
-  and any such handoff notes at the start of a new session.
-
-## Execution and acceptance contract
-
-[EXECUTION.md](docs/roadmap/EXECUTION.md) defines scope handling, evidence kinds,
-and handoff requirements for every contributor. Acceptance checkboxes have
-stable IDs; checked criteria require corresponding artifacts in
-[EVIDENCE.md](docs/roadmap/EVIDENCE.md). Owner judgement cannot be replaced by
-another assistant's favorable review. A plan revision and milestone completion
-are separate events.
-
-Run `python3 scripts/check_roadmap.py` after changing these documents or phase
-status. It checks structural consistency and evidence references, not whether
-the implementation behaves correctly or the conversation is welcome.
+For work state, read the active milestone's handoff. [EXECUTION](docs/roadmap/EXECUTION.md)
+owns the evidence process. [History](docs/history/README.md) preserves earlier
+decisions and approvals; it does not override this plan.
