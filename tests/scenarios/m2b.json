@@ -1,0 +1,31 @@
+{
+  "version": "m2b-v1-synthetic",
+  "source": {
+    "query": "puzzle design",
+    "request_url": "https://en.wikipedia.org/w/api.php?fixture=puzzle-design",
+    "items": [{"id": "wiki:en:10:20:fixture", "title": "Puzzle design", "url": "https://en.wikipedia.org/w/index.php?oldid=20", "excerpt": "A synthetic fixture: puzzle design can use constraints to shape possible solutions.", "revision": 20}],
+    "response": "{\"synthetic\": true, \"outcome\": \"relevant\"}"
+  },
+  "cases": [
+    {"name": "S16 S17 S19 grounded opening and continuation", "outcome": "relevant", "expected_messages": 1,
+     "decisions": [
+       {"kind": "query", "text": null, "seconds": null, "topic": "games", "query": "puzzle design", "reason": "Investigate the shared interest"},
+       {"kind": "speak", "text": "The retrieved introduction suggests thinking in constraints. Would that help your small puzzle game?", "seconds": null, "reason": "A concrete topic continuation", "references": ["wiki:en:10:20:fixture"]}
+     ]},
+    {"name": "S18 empty source stays silent", "outcome": "empty", "expected_messages": 0,
+     "decisions": [
+       {"kind": "query", "text": null, "seconds": null, "topic": "games", "query": "puzzle design", "reason": "Investigate the shared interest"},
+       {"kind": "wait", "text": null, "seconds": null, "reason": "No retrieved evidence"}
+     ]},
+    {"name": "S18 irrelevant source stays silent", "outcome": "irrelevant", "expected_messages": 0,
+     "decisions": [
+       {"kind": "query", "text": null, "seconds": null, "topic": "games", "query": "puzzle design", "reason": "Investigate the shared interest"},
+       {"kind": "wait", "text": null, "seconds": null, "reason": "The returned subject does not help this topic"}
+     ]},
+    {"name": "S18 source failure stays silent", "outcome": "error", "expected_messages": 0,
+     "decisions": [
+       {"kind": "query", "text": null, "seconds": null, "topic": "games", "query": "puzzle design", "reason": "Investigate the shared interest"},
+       {"kind": "wait", "text": null, "seconds": null, "reason": "Source failed; no claim to share"}
+     ]}
+  ]
+}

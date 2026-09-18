@@ -1,66 +1,85 @@
 # M2 Working Handoff
 
-## Status and scope
+## Status and authorization
 
-M2 is in progress. M1 owner acceptance is recorded in
-`docs/evidence/M1-acceptance.md`. The owner authorized the next implementation
-step and, after a quota interruption, explicitly requested continuation.
-M2a's internal foundation is implemented; no M2 exit criterion is checked.
-This work supports M2-E1/E2/E5, with partial S11–S25 mechanics only.
+M2 is in progress. M1 approval is recorded in `docs/evidence/M1-acceptance.md`.
+After the M2a foundation, the owner requested the next step. M2b's bounded
+source/memory/outcome mechanics are now implemented. All M2 exit criteria
+remain unchecked; live model behavior and owner quality review are pending.
 
-## Delivered
+The current work supports M2-E1/E2/E5 and partial S11–S25. It builds on the
+committed M2a snapshot `60cedbc`. This chunk is uncommitted; no push occurred.
 
-- Python 3.11+, standard-library runtime and small typed internal records.
-- Duplex terminal with explicit host controls, an offline diagnostic, and an
-  optional local Ollama structured-output adapter. No implicit model download.
-- SQLite events, recent conversation, decisions, call accounting, outbox,
-  controls, waits, and restart reconciliation under a single-process lock.
-- Pure decision/result separation from effects; current snapshot revisions
-  invalidate stale results. Hard gates run before evaluation and delivery.
-- Unknown sends require host resolution; no automatic resend. Model failures
-  and interruptions remain charged. Error state is inspectable via `/status`.
-- Recorded scenario pack, async failure tests, and actual terminal subprocess
-  replay with a second process confirming persisted conversation and mute.
+## Delivered in M2b
 
-Concrete defaults and their rationale are in M2.md; usage is in `docs/M2a.md`.
-These choices are reversible prototype details, not public framework APIs.
+- One optional Wikipedia edition (`--wikipedia en|zh`), using only read-only
+  search and bounded introductory extracts. No new runtime dependency.
+- Topic notes with exact user evidence, separate current/history records,
+  explicit host correction precedence, disabled topics and bounded context.
+- One active exploration with exact IDs, per-exploration query/model counters,
+  expiry, shared query allowance and a current host grant.
+- Durable query actions and outcomes committed with pending result events.
+  Restart consumes recorded outcomes; interrupted reads become failures without
+  automatic requery. Closed/expired work cannot resurrect from a late result.
+- Source-linked message candidates, stored revision URLs, exact-reference dedupe
+  and delivery revalidation. Research can continue during delivery mute.
+- User-turn-only model proposals for narrowing controls (mute/stop), with a
+  shell-generated acknowledgement. They cannot enable/resume or grant resources.
+  Slash controls remain deterministic; live intent interpretation is unproven.
+- Atomic schema 1 -> 2 migration, preserving prior conversation and model budget.
+- Replay pack plus real public source probe, kept distinct in the evidence.
+
+Host defaults, source scope and limits are in M2.md; commands and constraints
+are in `docs/M2b.md`. `docs/M2a.md` and its evidence describe the older snapshot.
 
 ## Verification (2026-09-18)
 
-- `PYTHONPATH=src python3.11 -m unittest discover -s tests -v`: 22 tests passed,
-  including a five-case recorded scenario pack and the CLI process test.
-- `python3 -m unittest discover -s scripts -p 'test_*.py'`: 11 tests passed.
-- `python3 scripts/check_roadmap.py`: structural/evidence references passed.
-- `python3.11 -m compileall -q src`: passed.
+- `PYTHONPATH=src python3.11 -m unittest discover -s tests -v`: 44 passed,
+  including the existing CLI subprocess and four new source-outcome cases.
+- `python3 -m unittest discover -s scripts -p 'test_*.py'`: 11 passed.
+- `python3 scripts/check_roadmap.py`: passed structural/reference checks.
+- `python3.11 -m compileall -q src scripts/probe_source.py`: passed.
+- `git diff --check`: passed.
+- Final-adapter real probe: English Wikipedia query `puzzle game`, three
+  results with revision URLs. Network sandbox initially blocked the request;
+  the authorized read-only probe outside it succeeded. Timestamp, source hash
+  and response metadata are in `docs/evidence/M2b-source-probe.json`.
 
-See `docs/evidence/M2a-foundation.md` for the precise coverage and source hash
-manifest. None of these results establishes conversation quality or owner
-acceptance. No package publication or live information retrieval was run.
-Changes remain in the working tree; no commit or push was performed.
+`docs/evidence/M2b-initiative.md` contains the current S11–S25 coverage map and
+`M2b-source-sha256.txt` identifies exact tested sources/config/fixtures.
+The source probe used synthetic public query text, no model or private chat.
+No live model conversation, Chinese-edition probe, owner quality approval,
+package release or publication was performed.
 
-An environment probe found the installed Ollama CLI crashing in its Metal/MLX
-startup, and the sandbox blocked a local HTTP probe. The optional adapter was
-tested with recorded wire responses only. Do not present it as a successful
-live session. A working service and an explicit model selection are still
-needed before M2d's real-model acceptance.
+## Important implementation facts
 
-## Lessons and next smallest step
+The model still returns only concrete actions and data. Store/runtime own all
+state transitions and external operations. Query acknowledgements cause one
+recoverable evaluation; send acknowledgements are terminal. Never route by
+semantic topic similarity. `main` is the continuing conversation; each bounded
+exploration has its own ID, and finishing it does not end the conversation.
 
-A timed mute arriving during a wake evaluation can invalidate the result and
-accidentally erase the next wake. The shell now schedules a fresh opportunity
-within the existing grant; a regression replay covers this race. This is an
-implementation repair within the accepted architecture, not a new scope rule.
+A timed-out HTTP worker can finish after the shell stops waiting. The source
+adapter tracks it and refuses overlapping source requests; its late response
+cannot commit state by itself. Runtime cancellation/expiry decides whether a
+result can become context. Unknown message delivery remains host-resolved.
 
-Proceed to M2b: first record one actual queryable source and its host-granted
-scope, per-exploration budget, expiry, and active-count cap in M2.md. Then build
-one complete query -> linked pending outcome -> reevaluation -> share or silence
-path. Retain provenance and allow the user's reply in the same context.
-Add bounded topic notes and explicit corrections; keep execution IDs separate
-from semantic topic grouping. Add natural-language control interpretation with
-hard host validation before claiming S15/S25 behavior in ordinary conversation.
+No architecture revision was needed: the result-routing strain resolution and
+S15/S25 distinction were implemented. M1's strain log now links the evidence.
+Current topic notes override historical claims, but choosing the right topic
+key and interpreting quoted/ambiguous language still need live evaluation.
 
-M2a currently uses only the `main` follow-up. Send acknowledgements are terminal
-events; query results in M2b must instead schedule recoverable reevaluation.
-Preserve the outbox and exact IDs rather than introducing a second runtime.
-Do not add vector storage, generic plugins, work monitoring, M3 trials, or a
-stable public API in this next step. Complete M2b/M2c/M2d before marking M2 done.
+## Next smallest step
+
+M2c: fill the remaining replay branches identified by the coverage map before
+claiming complete S11–S25 coverage. Prioritize crash/transaction fault injection,
+quiet-hour/cooldown boundaries with queued findings, weak-signal/cadence cases,
+ordinary-language control/correction interpretation fixtures, and repeated
+findings whose source revisions or wording differ. Avoid a generic plugin layer.
+
+Then M2d needs a working local model service, an explicitly selected installed
+model, and actual source-backed terminal conversations under the recorded limits.
+The previous M2a Ollama startup problem was not re-investigated in this chunk;
+do not assume it is fixed. Review genuine initiative, justified silence,
+continuity, grounding and burden with the owner. No M3 trial or M4 work scenario
+starts until M2's exit criteria are met.

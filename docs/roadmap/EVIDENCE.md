@@ -19,6 +19,9 @@ separately; no M2 acceptance is implied by M1 approval.
 | M2-E1 | document | `docs/evidence/M2a-foundation.md` | pending |
 | M2-E2 | replay | `docs/evidence/M2a-foundation.md` | pending |
 | M2-E5 | document | `docs/evidence/M2a-foundation.md` | pending |
+| M2-E1 | document | `docs/evidence/M2b-initiative.md` | pending |
+| M2-E2 | replay | `docs/evidence/M2b-initiative.md` | pending |
+| M2-E5 | document | `docs/evidence/M2b-initiative.md` | pending |
 
 ## Recording rules
 

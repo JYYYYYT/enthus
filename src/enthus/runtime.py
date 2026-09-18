@@ -3,25 +3,28 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import time
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from .models import Action, Context, Evaluation
+from .models import Action, Context, Evaluation, SourceResult
 from .store import Store
 
 Decide = Callable[[Context], Awaitable[Evaluation]]
 Send = Callable[[str, str], Awaitable[None]]
+Search = Callable[[str], Awaitable[SourceResult]]
 
 
 class Runtime:
     def __init__(self, store: Store, decide: Decide, send: Send,
-                 clock: Callable[[], float] = time.time) -> None:
+                 clock: Callable[[], float] = time.time, search: Search | None = None) -> None:
         self.store = store
         self.decide = decide
         self.send = send
         self.clock = clock
+        self.search = search
         self._step_lock = asyncio.Lock()
 
     def initiative_gate(self, now: float) -> tuple[str | None, float | None]:
@@ -64,22 +67,29 @@ class Runtime:
             if self.store.unknown_actions():
                 return False
             now = self.clock()
+            self.store.maintain_research(now)
             self.store.enqueue_due(now)
             action = self.store.pending_action()
             if action is not None:
-                await self._deliver(action)
+                if action.kind == "query":
+                    await self._query(action)
+                else:
+                    await self._deliver(action)
                 return True
             event = self.store.claim()
             if event is None:
                 return False
             if event.kind == "wake":
-                reason, until = self.initiative_gate(now)
+                research = self.search is not None and self.store.research_allowed(now) and bool(self.store.topics())
+                reason, until = (None, None) if research else self.initiative_gate(now)
+                if self.store.db.execute("SELECT 1 FROM explorations WHERE status='active'").fetchone():
+                    reason, until = "Exploration already active", now + self.store.settings.wake_interval
                 if reason is not None:
                     self.store.defer(event, until)
                     return True
             if not self.store.reserve_call(event):
                 return True
-            context = Context(event, self.store.state(), self.store.messages(), now)
+            context = self.store.context(event, now)
             try:
                 result = await asyncio.wait_for(self.decide(context), self.store.settings.model_timeout)
                 if not isinstance(result, Evaluation):
@@ -97,6 +107,10 @@ class Runtime:
         if action.revision != self.store.state().revision:
             self.store.discard_action(action, "Context or controls changed", None, stale=True)
             return
+        if (len(self.store.reference_items(action.references, self.clock())) != len(set(action.references))
+                or (action.unsolicited and self.store.already_shared(action.references))):
+            self.store.discard_action(action, "Source reference expired or already shared", None)
+            return
         if action.unsolicited:
             reason, until = self.initiative_gate(self.clock())
             if reason is not None:
@@ -113,6 +127,25 @@ class Runtime:
             self.store.finish_action(action.id, "unknown", self.clock(), f"{type(exc).__name__}: {exc}"[:500])
         else:
             self.store.finish_action(action.id, "sent", self.clock())
+
+    async def _query(self, action: Action) -> None:
+        if self.search is None:
+            self.store.discard_action(action, "Source adapter unavailable", None)
+            return
+        if not self.store.reserve_query(action, self.clock()):
+            return
+        query = json.loads(action.text)["query"]
+        try:
+            result = await asyncio.wait_for(self.search(query), self.store.settings.source_timeout)
+            if not isinstance(result, SourceResult) or result.query != query:
+                raise ValueError("Source returned a mismatched result")
+        except asyncio.CancelledError:
+            self.store.finish_query(action, None, self.clock(), "Query interrupted")
+            raise
+        except Exception as exc:
+            self.store.finish_query(action, None, self.clock(), f"{type(exc).__name__}: {exc}"[:500])
+        else:
+            self.store.finish_query(action, result, self.clock(), result.error)
 
     async def drain(self, max_steps: int = 64) -> int:
         """Bound a diagnostic/replay run so an unexpected loop fails visibly."""

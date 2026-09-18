@@ -1,0 +1,34 @@
+{
+  "checked_at": "2026-09-18T03:35:33.513139+00:00",
+  "source_code_sha256": "e59ef0845702ea317beb5793f8d5067262f7d53f2f8c06f49af0cffb017bcb14",
+  "kind": "live-source-probe-only",
+  "model": null,
+  "query": "puzzle game",
+  "request_url": "https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=puzzle+game&gsrnamespace=0&gsrlimit=3&prop=extracts%7Cinfo&exintro=1&explaintext=1&exchars=1200&exlimit=3&format=json&formatversion=2&maxlag=5",
+  "response_bytes": 2976,
+  "response_sha256": "ad31d91a87d76ef4daa50b4a266baeb67c01005bb0f97ede4a75384046dcebaa",
+  "error": null,
+  "items": [
+    {
+      "id": "wiki:en:32393:1374883252:040d62750782cea7",
+      "title": "Puzzle video game",
+      "url": "https://en.wikipedia.org/w/index.php?oldid=1374883252",
+      "revision": 1374883252,
+      "excerpt_characters": 355
+    },
+    {
+      "id": "wiki:en:86368:1369016903:94e9a3c6a233ae74",
+      "title": "Puzzle",
+      "url": "https://en.wikipedia.org/w/index.php?oldid=1369016903",
+      "revision": 1369016903,
+      "excerpt_characters": 638
+    },
+    {
+      "id": "wiki:en:432213:1368809695:528601e37003e55c",
+      "title": "15 puzzle",
+      "url": "https://en.wikipedia.org/w/index.php?oldid=1368809695",
+      "revision": 1368809695,
+      "excerpt_characters": 1169
+    }
+  ]
+}

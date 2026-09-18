@@ -16,6 +16,7 @@ from .decider import OllamaDecider, offline_decide
 from .models import Settings
 from .runtime import Runtime
 from .store import Store
+from .source import Wikipedia
 
 HELP = """Write a message and press Enter. Host controls:
   /start            Grant initiative for 24 hours (does not clear mute)
@@ -23,12 +24,15 @@ HELP = """Write a message and press Enter. Host controls:
   /mute [minutes]   Mute unsolicited output; omit duration for indefinite mute
   /resume           Clear mute (does not renew an expired/cancelled grant)
   /budget N         Set remaining decision-call allowance explicitly
+  /query-budget N   Set remaining source-query allowance explicitly
+  /topic KEY TEXT   Set/correct a current topic note (does not grant research)
+  /drop-topic KEY   Disable a topic and cancel its exploration
   /status           Show persisted state and unresolved deliveries
   /resolve ID sent|failed  Record a verified outcome; never resends the action
   /help             Show these controls
   /quit             Exit; interrupted work remains recoverable
 EOF drains queued work before exiting. /quit interrupts immediately.
-Natural-language control interpretation is not implemented yet; use commands.
+Model-interpreted mute/stop is experimental; slash commands are deterministic.
 Errors and blocked deliveries are recorded in /status; no unsolicited alerts.
 """
 
@@ -39,7 +43,15 @@ def host_command(store: Store, line: str, now: float) -> str:
     if command == "help" and len(parts) == 1:
         return HELP
     if command == "status" and len(parts) == 1:
-        return json.dumps({**asdict(store.state()), "unknown_deliveries": store.unknown_actions()}, indent=2)
+        return json.dumps({**asdict(store.state()), "unknown_deliveries": store.unknown_actions(),
+                           "topics": [asdict(topic) for topic in store.topics()],
+                           "wikipedia": store.settings.wikipedia}, indent=2, ensure_ascii=False)
+    if command == "topic" and len(parts) >= 3:
+        store.set_topic(parts[1], line.split(maxsplit=2)[2], now)
+        return "Current topic recorded. Older claims are retained as history; research authority is unchanged."
+    if command == "drop-topic" and len(parts) == 2:
+        store.drop_topic(parts[1], now)
+        return "Topic disabled and its exploration cancelled. History is retained."
     if command in {"start", "stop", "resume"} and len(parts) == 1:
         store.control(command, now)
         if command == "start":
@@ -51,9 +63,9 @@ def host_command(store: Store, line: str, now: float) -> str:
         store.control(command, now, float(parts[1]) * 60 if len(parts) == 2 else None)
         duration = f"for {parts[1]} minutes" if len(parts) == 2 else "until /resume"
         return f"Unsolicited conversation muted {duration}. Direct replies remain available."
-    elif command == "budget" and len(parts) == 2:
+    elif command in {"budget", "query-budget"} and len(parts) == 2:
         store.control(command, now, float(parts[1]))
-        return f"Remaining decision allowance set to {store.state().remaining_calls}."
+        return f"Remaining allowance updated. Decisions: {store.state().remaining_calls}; queries: {store.state().remaining_queries}."
     elif command == "resolve" and len(parts) == 3 and parts[2] in {"sent", "failed"}:
         if parts[1] not in store.unknown_actions():
             raise ValueError("Only an unknown delivery can be resolved by the host")
@@ -64,7 +76,7 @@ def host_command(store: Store, line: str, now: float) -> str:
 
 
 async def run(args: argparse.Namespace) -> None:
-    settings = Settings(timezone=args.timezone)
+    settings = Settings(timezone=args.timezone, wikipedia=args.wikipedia)
     decide = (OllamaDecider(args.model, settings, args.ollama_url)
               if args.mode == "ollama" else offline_decide)
     store = Store(args.database, settings)
@@ -77,7 +89,8 @@ async def run(args: argparse.Namespace) -> None:
         # Flush is our local acknowledgement; a crash around it is still unknown.
         print(f"\nEnthus [{identity}]: {text}", flush=True)
 
-    runtime = Runtime(store, decide, send)
+    source = Wikipedia(args.wikipedia, settings.source_timeout) if args.wikipedia else None
+    runtime = Runtime(store, decide, send, search=source)
 
     async def work() -> None:
         while not stopped.is_set():
@@ -88,10 +101,12 @@ async def run(args: argparse.Namespace) -> None:
                 await asyncio.sleep(0.1)
 
     try:
-        print(f"Enthus M2a | {args.mode} | {args.database}\n"
+        print(f"Enthus M2b | {args.mode} | {args.database}\n"
               "Initiative requires /start. Use /status to inspect restored controls.", flush=True)
         if args.mode == "offline":
-            print("OFFLINE DIAGNOSTIC: synthetic replies; no live model or information source.", flush=True)
+            print("OFFLINE DIAGNOSTIC: synthetic replies; no live model or autonomous queries.", flush=True)
+        if source:
+            print(f"Research source: {args.wikipedia}.wikipedia.org (short queries only). Topics and /start are required.", flush=True)
         print(HELP, flush=True)
         loop = asyncio.get_running_loop()
         reader = asyncio.StreamReader(limit=65536)
@@ -142,12 +157,13 @@ async def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Enthus M2a persistent conversation prototype")
+    parser = argparse.ArgumentParser(description="Enthus persistent conversation prototype")
     parser.add_argument("--database", type=Path, default=Path(".enthus/state.sqlite3"))
     parser.add_argument("--mode", choices=("offline", "ollama"), default="offline")
     parser.add_argument("--model", help="Explicit installed Ollama model; no automatic downloads")
     parser.add_argument("--ollama-url", default="http://127.0.0.1:11434")
     parser.add_argument("--timezone", default="Asia/Shanghai")
+    parser.add_argument("--wikipedia", choices=("en", "zh"), help="Enable one read-only Wikipedia source")
     args = parser.parse_args()
     if args.mode == "ollama" and not args.model:
         parser.error("--model is required in ollama mode")

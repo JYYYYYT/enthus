@@ -1,5 +1,9 @@
 # M2a: Running the conversation foundation
 
+Historical checkpoint guide. For the current source, topic, and experimental
+user-control behavior, see [M2b](M2b.md). M2a limitations below describe the
+foundation at its recorded snapshot, not every subsequent implementation.
+
 This checkpoint implements mechanics for the conversational MVP. It is an
 experimental local application, not the extracted public framework. M2b still
 needs retrieval, topic memory, and grounded proactive conversation.

@@ -33,9 +33,11 @@ terminal, bounded recent context, SQLite persistence, explicit waits, and
 budget/mute/cancel/restart controls. It has recorded replays and a terminal
 process test; it does not yet prove worthwhile live initiative.
 
-Queryable information, topic notes, and grounded initiative are the next M2b
-checkpoint. M3 evaluates sustained experience; M4 tests a work scenario before
-extracting reusable interfaces.
+M2b now adds one bounded Wikipedia source, current topic notes and correction
+history, recoverable query results, and source-linked message candidates.
+Synthetic replays cover sharing and silence; a real source probe also passed.
+A live model conversation and owner quality review remain pending.
+M3 evaluates sustained experience; M4 tests a work scenario before extraction.
 
 - [Roadmap.md](Roadmap.md) — vision, architecture, and milestone order
 - [docs/roadmap/M1.md](docs/roadmap/M1.md) — scenarios and design strain log
@@ -56,8 +58,9 @@ ignored `.enthus/state.sqlite3` file. Use `/help` and `/status` to inspect the
 controls, `/start` to grant initiative, and `/quit` to exit.
 
 An optional local Ollama adapter requires an explicitly chosen installed model.
-Read [the M2a guide](docs/M2a.md) for that invocation, recovery semantics, and
-current limitations. No real model/source trial has passed yet.
+Read [the M2b guide](docs/M2b.md) to enable source-backed initiative and inspect
+its limits. [The M2a guide](docs/M2a.md) describes the original foundation.
+The successful source probe is not a live model/conversation acceptance trial.
 
 ```sh
 PYTHONPATH=src python3.11 -m unittest discover -s tests -v
@@ -65,8 +68,9 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 python3 scripts/check_roadmap.py
 ```
 
-[M2a evidence](docs/evidence/M2a-foundation.md) records the exact tested scope
-and the remaining S11–S25 gaps.
+[M2b evidence](docs/evidence/M2b-initiative.md) records the current tested scope
+and remaining S11–S25 gaps. [M2a evidence](docs/evidence/M2a-foundation.md) is the
+historical foundation snapshot.
 
 ## Contributor entry point
 
