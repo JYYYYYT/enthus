@@ -5,25 +5,32 @@
 
 ## Implemented
 
-The terminal/source prototype at `80f976f` has SQLite state, topic corrections,
-bounded Wikipedia queries, result routing, and budget/mute/cancel controls.
-Live audiovisual presence is not implemented. No successful live-model
-conversation or owner quality acceptance is recorded.
+A local browser/Python prototype connects selected screen and microphone streams
+to Gemini Live. It provides explicit start, speech/sensor/session stops, bounded
+media and lifetime, metadata traces, and no reconnect. The thin baseline comes
+first; no new semantic initiative policy is claimed. Start instructions are in
+[README](../../README.md); configuration and coverage are in the
+[P1 run sheet](../evidence/M2-presence-p1.md).
+
+The earlier terminal/source prototype remains available and unchanged.
 
 ## Verified and unresolved
 
-Historical product tests and the source probe are in [M2b evidence](../evidence/M2b-initiative.md).
-The earlier Ollama startup issue was not rechecked; M2-P1 may choose another
-model path. Product/media tests were not rerun for the documentation cleanup.
-Documentation checks and 19 checker tests passed; details are in
-[revision evidence](../evidence/continuous-presence-revision.md).
+54 Python tests and four JavaScript replay tests pass, including the synthetic
+WebSocket bridge and late-grant cancellation. Browser idle state and sketch
+interaction were inspected without accessing sensors. Roadmap checks pass.
+No real Gemini call, media session, latency measurement, or owner experience
+review has run: the host has no configured API key. Full S31 controls, semantic
+staleness, conservative monetary accounting, and actual media behavior remain
+gaps. Resource caps alone are not a verified dollar ceiling.
 
 ## Next step
 
-Select one shared activity, visual/voice surface, and model path. Record concrete
-dependencies, numeric limits, interruption targets, and baseline in M2 before
-implementation. Build the smallest granted live session showing fresh input
-after a reply ends and a working stop (S26/S31). Label synthetic checks.
+Make Gemini access available locally; verify the selected model and spending
+accounting. Run the bounded baseline through actual granted screen/microphone
+input, starting with S26/S31, and export metadata. Inspect the two-second playback
+queue and browser capture behavior against real provider pacing before expanding
+P2. Do not mark P1 complete from the synthetic checks.
 
 The owner authorized the presence direction and concise documentation. No new
 scope approval is needed for that work; model access and actual capture grants

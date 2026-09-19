@@ -26,6 +26,9 @@ New presence criteria remain unchecked. Retired IDs and scope changes are in
 | M2-E7 | document | `docs/evidence/continuous-presence-revision.md` | pending |
 | M1-E2 | document | `docs/history/M1-2026-09-17.md` | pass |
 | M1-E3 | document | `docs/history/M1-2026-09-17.md` | pass |
+| M2-E7 | document | `docs/evidence/M2-presence-p1.md` | pending |
+| M2-E9 | replay | `docs/evidence/M2-presence-p1.md` | pending |
+| M2-E11 | document | `docs/evidence/M2-presence-p1.md` | pending |
 
 M1 document rows now point to archived material; the original owner statement
 and accepted hashes remain authoritative. Prior M2 rows describe the terminal/

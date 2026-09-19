@@ -25,14 +25,37 @@ The precise behavior is defined in [Roadmap](Roadmap.md#continuous-presence-cont
 
 ## Current state
 
-**M2 is in progress; live audiovisual presence is not implemented yet.**
-The existing terminal prototype has topic memory, bounded Wikipedia queries,
-persistent state, and budget/mute/cancel controls. It has recorded tests and a
-source probe, but no successful live-model experience acceptance.
+**M2-P1 has a local browser prototype; real audiovisual experience is unverified.**
+It connects selected screen/microphone input to Gemini Live, with separate speech,
+sensor, and session stops, bounded media, and metadata traces. Synthetic bridge
+and playback tests pass. Model access, real capture, interruption latency, and
+owner review are still pending. Selective initiative is not yet established.
 
-Next: choose one shared activity and model/media path, then demonstrate fresh
-input after a reply ends and a working stop. See [M2](docs/roadmap/M2.md) for the
-plan and [current handoff](docs/roadmap/M2-NOTES.md) for the working state.
+See [M2](docs/roadmap/M2.md) for the plan and the
+[current handoff](docs/roadmap/M2-NOTES.md) for remaining work.
+
+## Try the presence prototype
+
+Python 3.11+ and a browser supporting screen capture and AudioWorklet (start with
+Chrome). Install the optional live dependency in a local environment:
+
+```sh
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -e '.[live]'
+.venv/bin/enthus-live --prompt-key
+```
+
+Enter a Gemini API key at the hidden terminal prompt; it is not saved. Alternatively
+set `GEMINI_API_KEY` in the host environment. Open `http://127.0.0.1:8765`, then
+explicitly start sharing a sketch tab/window and microphone. Use headphones.
+Without a key, omit `--prompt-key` to inspect the UI with capture disabled.
+
+The default model is `gemini-3.8-live`; `ENTHUS_LIVE_MODEL` can select another
+compatible Live model. Availability must be checked against your account.
+Sessions end after 120 seconds and never reconnect automatically. This is a thin
+model baseline, not accepted co-presence. Read the short
+[run sheet](docs/evidence/M2-presence-p1.md) for limits, controls, cost limitations,
+and the first live check. Export metadata explicitly if recording a trial.
 
 ## Try the existing terminal
 

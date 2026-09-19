@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Enthus · Shared sketch</title>
+  <style>
+    :root { color-scheme: light; font: 16px/1.5 system-ui; color: #20352d; background: #f5f4ee; }
+    body { max-width: 1100px; margin: 40px auto; padding: 0 24px; }
+    h1 { font-size: 36px; letter-spacing: -.04em; margin-bottom: 8px; }
+    .muted { color: #5e6f67; } .tag { font-size: 13px; text-transform: uppercase; letter-spacing: .12em; }
+    button { font: inherit; padding: 10px 16px; border: 1px solid #b9c6bc; border-radius: 9px; background: white; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: default; } button.primary { background: #265847; color: white; }
+    button.danger { color: #923e32; } button:focus-visible { outline: 3px solid #487cdd; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+    section { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #dce3dc; }
+    canvas { width: 100%; background: #f7faf6; border: 1px solid #c8d7cb; touch-action: none; }
+    video { width: 100%; max-height: 240px; background: #e4eae4; border-radius: 8px; }
+    #status { padding: 12px 16px; background: #e1eae0; border-radius: 9px; }
+    #events { max-height: 180px; overflow: auto; font-size: 13px; white-space: pre-wrap; }
+    @media(max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <p class="tag">Enthus / M2-P1 · Thin model baseline</p>
+  <h1>Share a sketch. Stay in the moment.</h1>
+  <p class="muted">Draw a game layout here, or share your own sketch window. Speak naturally, then change the sketch after the reply ends.</p>
+  <p id="status" role="status" aria-live="polite">Idle. Screen and microphone are off.</p>
+  <p id="configuration" class="muted">Checking local configuration…</p>
+  <div class="controls">
+    <button id="start" class="primary" disabled>Start sharing + microphone</button>
+    <button id="speech" disabled>Stop current speech</button>
+    <button id="screen" disabled>Stop screen</button>
+    <button id="microphone" disabled>Stop microphone</button>
+    <button id="end" class="danger" disabled>End session / stop all</button>
+  </div>
+  <p class="muted">A session lasts at most 2 minutes. Only your selected surface and microphone go to Gemini. No background work. Stopped sensors stay off until a new session. No raw media is saved locally.</p>
+  <div class="grid">
+    <section><h2>Shared activity</h2><p>Sketch a game scene: paths, rooms, obstacles. Select this tab/window in the sharing picker to discuss it.</p>
+      <canvas id="sketch" width="768" height="480" aria-label="Game layout sketch"></canvas>
+      <div class="controls"><button id="clear">Clear sketch</button><button id="obstacle">Add obstacle</button></div>
+    </section>
+    <section><h2>What is shared</h2><video id="preview" muted autoplay playsinline></video>
+      <p id="sensors">Screen: off · Microphone: off</p>
+      <p id="freshness" class="muted">No observations sent.</p>
+      <h3>Session events</h3><div id="events" aria-live="off"></div>
+      <button id="export">Export metadata trace</button>
+    </section>
+  </div>
+  <p class="muted">Experimental: native perception and voice come from Gemini. Selective initiative, semantic staleness, and “mute unsolicited only” are not yet validated. This is not M2 acceptance.</p>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

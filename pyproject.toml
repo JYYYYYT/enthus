@@ -9,11 +9,15 @@ description = "An experimental proactive conversation runtime"
 requires-python = ">=3.11"
 dependencies = []
 
+[project.optional-dependencies]
+live = ["aiohttp>=3.12,<4"]
+
 [project.scripts]
 enthus = "enthus.cli:main"
+enthus-live = "enthus.live:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-enthus = ["py.typed"]
+enthus = ["py.typed", "web/*"]
